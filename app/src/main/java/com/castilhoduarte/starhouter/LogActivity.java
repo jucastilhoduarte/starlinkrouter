@@ -28,6 +28,7 @@ public final class LogActivity extends Activity {
         logText = findViewById(R.id.log_text);
         scroll = findViewById(R.id.log_scroll);
         findViewById(R.id.refresh_button).setOnClickListener(v -> load());
+        findViewById(R.id.close_button).setOnClickListener(v -> finish());
     }
 
     @Override
