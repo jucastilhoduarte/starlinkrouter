@@ -1,6 +1,8 @@
 package com.castilhoduarte.starhouter;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -44,12 +46,29 @@ public final class MainActivity extends Activity {
         bigButton.setOnClickListener(v -> toggle());
         findViewById(R.id.logs_button).setOnClickListener(
                 v -> startActivity(new Intent(this, LogActivity.class)));
-        findViewById(R.id.settings_button).setOnClickListener(
-                v -> startActivity(new Intent(Settings.ACTION_SETTINGS)));
+        findViewById(R.id.settings_button).setOnClickListener(v -> openAndroidSettings());
 
         // Garante que o serviço em segundo plano (watchdog) está ativo mesmo que o daemon tenha
         // sido iniciado apenas pela interface nesta sessão.
         BootService.start(this);
+    }
+
+    /**
+     * Abre o painel completo de Configurações do Android (rede, Bluetooth, armazenamento, etc.).
+     * O {@code Settings.ACTION_SETTINGS} genérico cai no painel OEM capado da head unit, então
+     * miramos a activity AOSP real {@code com.android.settings/.Settings} de forma explícita —
+     * o mesmo caminho usado pelo Haval Tools / Impulse. Cai para o intent genérico se a activity
+     * explícita não existir nesta build.
+     */
+    private void openAndroidSettings() {
+        Intent explicit = new Intent(Intent.ACTION_MAIN);
+        explicit.setComponent(new ComponentName("com.android.settings", "com.android.settings.Settings"));
+        explicit.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        try {
+            startActivity(explicit);
+        } catch (ActivityNotFoundException e) {
+            startActivity(new Intent(Settings.ACTION_SETTINGS));
+        }
     }
 
     private void toggle() {

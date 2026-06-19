@@ -119,14 +119,33 @@ public final class StarHouter {
 
     // ---- operações privilegiadas (somente na thread de background) ----
 
+    // O shell telnet roda em modo canônico: uma linha de entrada é truncada em MAX_CANON (4096
+    // bytes). O base64 do script (~13 KB) num único `echo` estourava esse limite e chegava cortado
+    // no meio de um loop -> "unmatched 'for'". Enviamos o base64 em pedaços pequenos, um `echo ...
+    // >> arquivo.b64` por linha (cada linha bem abaixo de 4096), e decodificamos no fim. base64 -d
+    // ignora os newlines entre os pedaços, então o arquivo remontado é idêntico.
+    private static final int B64_CHUNK = 1024;
+
     private void pushScript() {
         String b64 = readAssetBase64();
         if (b64.isEmpty()) {
             Log.e(TAG, "empty starhouter.sh asset");
             return;
         }
-        String cmd = "echo " + b64 + " | base64 -d > " + SCRIPT + " && chmod 755 " + SCRIPT;
-        run(cmd);
+        String b64file = SCRIPT + ".b64";
+        StringBuilder cmd = new StringBuilder("rm -f ").append(b64file);
+        for (int i = 0; i < b64.length(); i += B64_CHUNK) {
+            int end = Math.min(i + B64_CHUNK, b64.length());
+            cmd.append("\necho ").append(b64, i, end).append(" >> ").append(b64file);
+        }
+        cmd.append("\nbase64 -d ").append(b64file)
+                .append(" > ").append(SCRIPT)
+                .append(" && chmod 755 ").append(SCRIPT)
+                .append(" && rm -f ").append(b64file);
+        TelnetRoot.Result r = run(cmd.toString());
+        if (r == null || !r.ok()) {
+            Log.e(TAG, "pushScript failed: " + (r == null ? "no telnet" : r.output));
+        }
     }
 
     private void startDaemon() {

@@ -21,18 +21,17 @@
   <rect width="840" height="360" rx="8" fill="url(#bgGlow)"/>
   <rect width="840" height="360" rx="8" fill="none" stroke="#2d2d3d" stroke-width="2"/>
 
-  <!-- Logo: estrela irradiando arcos Wi-Fi -->
-  <!-- estrela 5 pontas centrada em 420,106 -->
-  <path d="M420,99 L421.9,103.8 L427,104.2 L423.3,107.5 L424.5,112.5 L420,109.8 L415.5,112.5 L416.7,107.5 L413,104.2 L418.1,103.8 Z" fill="#F59E0B"/>
-  <!-- arc 1 -->
-  <path d="M409 97 Q420 89 431 97" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-  <!-- arc 2 -->
-  <path d="M400 89 Q420 75 440 89" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.7"/>
-  <!-- arc 3 -->
-  <path d="M391 81 Q420 62 449 81" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.35"/>
-
-  <!-- App title -->
-  <text x="420" y="122" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#a0aec0" letter-spacing="3">STARHOUTER</text>
+  <!-- Logo: estrela irradiando arcos Wi-Fi (somente o logo, maior, centralizado) -->
+  <g transform="translate(420,95) scale(1.7) translate(-420,-95)">
+    <!-- estrela 5 pontas centrada em 420,106 -->
+    <path d="M420,99 L421.9,103.8 L427,104.2 L423.3,107.5 L424.5,112.5 L420,109.8 L415.5,112.5 L416.7,107.5 L413,104.2 L418.1,103.8 Z" fill="#F59E0B"/>
+    <!-- arc 1 -->
+    <path d="M409 97 Q420 89 431 97" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    <!-- arc 2 -->
+    <path d="M400 89 Q420 75 440 89" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.7"/>
+    <!-- arc 3 -->
+    <path d="M391 81 Q420 62 449 81" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.35"/>
+  </g>
 
   <!-- Toggle button -->
   <rect x="290" y="152" width="260" height="72" rx="14" fill="url(#btnGrad)" filter="url(#btnShadow)"/>
