@@ -1,9 +1,9 @@
 #!/bin/sh
 
-# install-any.sh - instala qualquer APK na head unit usando o exploit Frida.
+# install-apk.sh - instala qualquer APK na head unit usando o exploit Frida.
 #
 # Uso:
-#   sh install-any.sh <url-do-apk>
+#   sh install-apk.sh <url-do-apk>
 #
 # A URL e obrigatoria. Aceita .apk direto ou .zip contendo .apk.
 # GH_TOKEN (opcional, via env): Bearer no download (URLs privadas/artifacts).

@@ -11,6 +11,7 @@ Não está em nenhuma loja. Instalado apenas no meu carro, assinado com minha pr
 ![Mockup da UI do Starlink Router (tela de carro 21:9)](docs/ui-mockup.svg)
 
 Uma tela (paisagem 21:9):
+
 - Botão de alternância grande **LIGADO / DESLIGADO**
 - Chip: `Trafegando via Starlink` ou `Trafegando via 4G`
 - Botões de ação horizontais (ícone + texto): **Logs** e **Configurações**
@@ -53,13 +54,13 @@ Baixa os binários do Frida do release `exploit-bins` e o APK do último release
 Para instalar APKs externos que a multimídia bloqueia (ex: LibreTube, NewPipe, etc.):
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/jucastilhoduarte/starlinkrouter/main/scripts/install-any.sh | sh -s -- <url-do-apk>
+curl -fsSL https://raw.githubusercontent.com/jucastilhoduarte/starlinkrouter/main/scripts/install-apk.sh | sh -s -- <url-do-apk>
 ```
 
 Exemplo:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/jucastilhoduarte/starlinkrouter/main/scripts/install-any.sh | sh -s -- https://github.com/libre-tube/LibreTube/releases/download/v0.27.2/LibreTube.apk
+curl -fsSL https://raw.githubusercontent.com/jucastilhoduarte/starlinkrouter/main/scripts/install-apk.sh | sh -s -- https://github.com/libre-tube/LibreTube/releases/download/v0.27.2/LibreTube.apk
 ```
 
 Aceita `.apk` direto ou `.zip` contendo `.apk`. Binários do Frida são cacheados em `/data/local/tmp` — downloads subsequentes pulam as fases 1–2.
