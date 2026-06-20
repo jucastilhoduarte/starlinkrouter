@@ -14,7 +14,7 @@
 
 set -u
 
-REPO="https://github.com/jucastilhoduarte/starlinkrouter"
+REPO="https://github.com/jucastilhoduarte/jlh6"
 WORK="/data/local/tmp"
 ROLLBACK_ENABLED=true
 

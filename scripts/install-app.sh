@@ -1,23 +1,22 @@
 #!/bin/sh
 
-# install.sh - instala (idempotente) o Starlink Router a partir de um APK.
+# install-app.sh - instala (idempotente) o JLH6 a partir de um APK.
 #
 # Uso:
-#   sh install.sh [url-do-apk]
+#   sh install-app.sh [url-do-apk]
 #
 # Sem argumento: baixa o .apk do ultimo release do REPO abaixo.
 # Com argumento: usa a URL dada. Aceita .apk direto ou zip (extrai o .apk de dentro).
 #
 # GH_TOKEN (opcional, via env): vai como Bearer no download (so para URL privada/artifact).
 #
-# Por que o exploit Frida e necessario: o app so consegue falar com o shell root
-# em telnet 127.0.0.1:23 se for instalado com uid <= 10999. Esse uid e herdado quando o
-# app e instalado DURANTE a janela de injecao no system_server (fases 1-3).
+# Por que o exploit Frida e necessario: a multimidia bloqueia pm install
+# de APKs externos. A injecao no system_server remove essa restricao.
 
 set -u
 
-PKG="com.castilhoduarte.starlinkrouter"
-REPO="https://github.com/jucastilhoduarte/starlinkrouter"
+PKG="com.castilhoduarte.jlh6"
+REPO="https://github.com/jucastilhoduarte/jlh6"
 WORK="/data/local/tmp"
 ROLLBACK_ENABLED=true
 
@@ -30,7 +29,7 @@ cleanup() {
     [ "$ROLLBACK_ENABLED" = false ] && exit 0
     log "INFO" "Rollback..."
     rm -rf "$WORK/unz" 2>/dev/null || true
-    rm -f "$WORK/artifact.bin" "$WORK/starlinkrouter_new.apk" 2>/dev/null || true
+    rm -f "$WORK/artifact.bin" "$WORK/jlh6_new.apk" 2>/dev/null || true
     log "INFO" "Rollback concluido"
 }
 trap cleanup EXIT
@@ -92,8 +91,7 @@ main() {
         log "INFO" "fridaserver iniciado"
     fi
 
-    # --- Fase 3: injecao no system_server (precisa estar ativa no momento do install
-    #     pra o app instalado herdar uid <= 10999 e alcancar o telnet:23) ---
+    # --- Fase 3: injecao no system_server ---
     log "INFO" "Fase 3: Injecao system_server"
     [ -f "system_server.js" ] || die "system_server.js nao encontrado"
     SYSTEM_PID=$(pidof system_server) || die "system_server nao encontrado"
@@ -104,7 +102,7 @@ main() {
     # --- Fase 4: baixar e resolver o APK alvo ---
     log "INFO" "Fase 4: Baixar APK alvo"
     rm -rf unz 2>/dev/null || true
-    rm -f artifact.bin starlinkrouter_new.apk 2>/dev/null || true
+    rm -f artifact.bin jlh6_new.apk 2>/dev/null || true
     download "$URL" "artifact.bin" "artifact/apk"
 
     APK=""
@@ -117,28 +115,28 @@ main() {
         [ -n "$APK" ] || die "Nenhum .apk dentro do zip"
     else
         log "INFO" "Download tratado como .apk direto"
-        mv -f artifact.bin starlinkrouter_new.apk || die "Falha ao preparar apk"
-        APK="$WORK/starlinkrouter_new.apk"
+        mv -f artifact.bin jlh6_new.apk || die "Falha ao preparar apk"
+        APK="$WORK/jlh6_new.apk"
     fi
     [ -s "$APK" ] || die "APK final vazio"
 
-    # --- Fase 5: instalar Starlink Router ---
+    # --- Fase 5: instalar JLH6 ---
     # uninstall do proprio obrigatorio antes de reinstalar: assinatura propria difere de
     # uma versao anterior, entao pm install -r por cima falharia (UPDATE_INCOMPATIBLE).
     log "INFO" "Fase 5: Instalar $PKG"
     if app_installed "$PKG"; then
-        log "INFO" "Desinstalando versao atual do Starlink Router"
+        log "INFO" "Desinstalando versao atual do JLH6"
         pm uninstall "$PKG" >/dev/null 2>&1 || log "WARN" "uninstall falhou (seguindo)"
     fi
-    pm install "$APK" || die "Falha na instalacao do Starlink Router"
+    pm install "$APK" || die "Falha na instalacao do JLH6"
 
     # --- limpeza ---
     rm -rf unz 2>/dev/null || true
-    rm -f artifact.bin starlinkrouter_new.apk 2>/dev/null || true
+    rm -f artifact.bin jlh6_new.apk 2>/dev/null || true
     ROLLBACK_ENABLED=false
 
     log "INFO" "Instalado: $(pm path "$PKG" 2>/dev/null)"
-    echo "🎉 Starlink Router instalado! Abra uma vez para ligar; depois ele sobe sozinho no boot."
+    echo "JLH6 instalado com sucesso."
 }
 
 main "$@"
