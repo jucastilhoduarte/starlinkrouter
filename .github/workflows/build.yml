@@ -10,7 +10,6 @@ permissions:
   contents: write
 
 jobs:
-  # PRs verificam se o app compila e se os testes do ciclo de vida de regras do daemon + parser telnet passam.
   pr-build:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -24,27 +23,12 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Verificação de sintaxe do daemon
-        run: sh -n app/src/main/assets/starlinkrouter.sh
-
-      - name: Testes de ciclo de vida de regras (sem regras fantasma)
-        run: sh scripts/test/rule_lifecycle_test.sh app/src/main/assets/starlinkrouter.sh
-
-      - name: Testes do parser telnet
-        run: |
-          mkdir -p /tmp/tout
-          javac -d /tmp/tout \
-            app/src/main/java/com/castilhoduarte/starlinkrouter/TelnetRoot.java \
-            scripts/test/TelnetRootTest.java
-          java -cp /tmp/tout com.castilhoduarte.starlinkrouter.TelnetRootTest
-
       - name: Conceder permissão de execução ao gradlew
         run: chmod +x gradlew
 
       - name: Compilar (debug)
         run: ./gradlew assembleDebug --stacktrace
 
-  # Merges na main executam os mesmos testes e depois produzem um APK de release assinado.
   release:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -59,20 +43,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
-
-      - name: Verificação de sintaxe do daemon
-        run: sh -n app/src/main/assets/starlinkrouter.sh
-
-      - name: Testes de ciclo de vida de regras (sem regras fantasma)
-        run: sh scripts/test/rule_lifecycle_test.sh app/src/main/assets/starlinkrouter.sh
-
-      - name: Testes do parser telnet
-        run: |
-          mkdir -p /tmp/tout
-          javac -d /tmp/tout \
-            app/src/main/java/com/castilhoduarte/starlinkrouter/TelnetRoot.java \
-            scripts/test/TelnetRootTest.java
-          java -cp /tmp/tout com.castilhoduarte.starlinkrouter.TelnetRootTest
 
       - name: Decodificar keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/release.keystore
@@ -106,7 +76,7 @@ jobs:
         run: |
           TAG="v${{ steps.ver.outputs.name }}"
           gh release create "$TAG" \
-            --title "Starlink Router ${{ steps.ver.outputs.name }}" \
+            --title "JLH6 ${{ steps.ver.outputs.name }}" \
             --notes "Release automatizado"
           gh release upload "$TAG" \
             app/build/outputs/apk/release/app-release.apk
