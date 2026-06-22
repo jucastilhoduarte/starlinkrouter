@@ -12,12 +12,12 @@ Roteia o tráfego do hotspot (`wlan2`) via Starlink (`wlan0`) usando iptables + 
 
 Estados do botão:
 
-| Estado | Cor | Significado |
-|--------|-----|-------------|
-| DESATIVADO | cinza | roteamento desligado |
-| ATIVANDO... | laranja | aguardando ping bem-sucedido via `wlan0` |
-| ATIVADO | verde | roteamento ativo |
-| DESATIVANDO... | laranja | removendo regras |
+| Estado         | Cor     | Significado                              |
+| -------------- | ------- | ---------------------------------------- |
+| DESATIVADO     | cinza   | roteamento desligado                     |
+| ATIVANDO...    | laranja | aguardando ping bem-sucedido via `wlan0` |
+| ATIVADO        | verde   | roteamento ativo                         |
+| DESATIVANDO... | laranja | removendo regras                         |
 
 O roteamento só é aplicado após o primeiro `ping -I wlan0 8.8.8.8` bem-sucedido (loop de 5s). Se após 10 minutos nenhum ping funcionar, volta para DESATIVADO automaticamente.
 
