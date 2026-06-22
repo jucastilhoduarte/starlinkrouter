@@ -34,7 +34,9 @@ Aplicativo Android para a head unit pessoal de um carro Haval/GWM. Uma tela:
 | `app/src/main/java/com/castilhoduarte/jlh6/JLH6App.java` | Application. `onCreate` → `restoreIfEnabled`. Roda sempre que o processo nasce (inclusive religado no boot pelo accessibility). |
 | `app/src/main/java/com/castilhoduarte/jlh6/RouterAccessibilityService.java` | Âncora de autostart, habilitado **manualmente** pelo usuário na config do Android. `isEnabled()` checa o estado; `onServiceConnected` → `restoreIfEnabled`. |
 | `app/src/main/java/com/castilhoduarte/jlh6/BootReceiver.java` | Reforço. `exported=true`. BOOT_COMPLETED / QUICKBOOT_POWERON / MY_PACKAGE_REPLACED → `restoreIfEnabled` direto (sem service). |
-| `scripts/install-app.sh` | Instala o JLH6 via exploit Frida (bypass de pm install). |
+| `app/src/main/java/com/castilhoduarte/jlh6/Updater.java` | Android-free. Helpers puros (compara versão do release GitHub vs `versionCode` local; monta o comando de lançamento destacado) + adapters de I/O (`checkUpdate` via GitHub API, `triggerUpdate` via telnet). |
+| `scripts/test/UpdaterTest.java` | Testes JDK puro das funções puras do `Updater`. |
+| `scripts/install-app.sh` | Instala o JLH6 via exploit Frida (bypass de pm install). Termina com `am start` pra reabrir o app atualizado (usado pelo botão de update in-app). |
 | `scripts/install-apk.sh` | Instala qualquer APK via exploit Frida. |
 | `scripts/test/TelnetRootTest.java` | 15 testes do TelnetRoot. JDK puro, sem Gradle. |
 
@@ -146,6 +148,8 @@ Secrets: `KEYSTORE_BASE64`, `STORE_PASSWORD`, `KEY_PASSWORD`, `KEY_ALIAS`.
 ## Design da UI
 
 Tema escuro, landscape, 21:9. Sem ActionBar. Empilhado verticalmente, centralizado, de cima para baixo: botão **Configurações** (engrenagem + texto), botão **Starlink Router** (wifi + texto), **switch** de recuperação automática. Botões retangulares.
+
+Canto superior direito: **versão atual (`vX.X.X`)** sempre visível + **ícone de update** sempre visível. Ícone habilitado só quando o último release do GitHub tem `versionCode` maior. Tap com router DISABLED → dialog de confirmação → dispara o `install-app.sh` remoto destacado via telnet (sucesso = `pm install -r` mata o app, e o `am start` do script o reabre atualizado). Tap com router ligado → dialog "desative o Starlink Router antes de atualizar". Durante o update toda a UI fica bloqueada, ícone vira spinner e o label troca para "Atualizando para vX.X.X". Watchdog de 120s recupera a falha-sem-morte (restaura o ícone). Checagem de versão roda em `onResume` (background, fail-safe: rede/parse ruim → ícone desabilitado).
 
 ## Pacote / assinatura
 
