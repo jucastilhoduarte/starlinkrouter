@@ -29,6 +29,7 @@ public class RouterCoreTest {
         scenarioConcurrentActivation();
         scenarioRapidToggle();
         scenarioRecoveryLoopProtection();
+        scenarioPartialApplyTimeout();
         scenarioCommandStrings();
         System.out.println("\n" + passed + " passed, " + failed + " failed");
         if (failed > 0) System.exit(1);
@@ -250,6 +251,20 @@ public class RouterCoreTest {
         r.sched.advance(120_000);
         check("#15 loop: stays DISABLED", r.core.getState() == RouterCore.State.DISABLED
                 && r.sched.pending() == 0);
+    }
+
+    // #12 — partial apply that can never verify, driven to timeout: no phantom rules
+    static void scenarioPartialApplyTimeout() {
+        Rig r = new Rig();
+        r.kernel.setUplinkUp(true);           // ping ok -> apply runs
+        r.kernel.setFailIpForwardWrite(true); // verify can never pass (ip_forward stuck 0)
+        r.core.enable();
+        r.sched.advance(0);
+        check("#12 partial: not ACTIVE", r.core.getState() != RouterCore.State.ACTIVE);
+        check("#12 partial: STARTING (retrying)", r.core.getState() == RouterCore.State.STARTING);
+        r.sched.advance(700_000);             // drive past 10-min timeout
+        check("#12 partial-timeout: DISABLED", r.core.getState() == RouterCore.State.DISABLED);
+        check("#12 partial-timeout: NO phantom rules (INV2)", r.kernel.clean());
     }
 
     // #16 — command-string regression guard

@@ -86,6 +86,7 @@ public final class RouterCore {
             monitorRunning = false;
             store.setEnabled(false);
             store.setAutoRecovery(false);
+            execPurge();
             state = State.DISABLED;
             return;
         }
